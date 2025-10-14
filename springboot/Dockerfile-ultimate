@@ -2,7 +2,7 @@ FROM maven:3-eclipse-temurin-21 AS build
 WORKDIR /opt/app
 COPY src ./src
 COPY pom.xml .
-RUN --mount=type=cache,target=/root/.m2 mvn package -DskipTests
+RUN --mount=type=cache,target=/root/.m2 mvn package -Dmaven.test.skip=true --no-transfer-progress
 RUN jar xf target/simplecode-0.0.1-SNAPSHOT.jar
 RUN jdeps --ignore-missing-deps -q  \
     --recursive  \
