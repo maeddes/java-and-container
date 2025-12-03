@@ -1,0 +1,18 @@
+FROM maven:3-eclipse-temurin-21 AS builder
+WORKDIR /opt/app
+COPY src ./src
+COPY pom.xml .
+RUN --mount=type=cache,target=/root/.m2 mvn -f /opt/app/pom.xml package -DskipTests
+
+FROM eclipse-temurin:21-jre AS extractor
+WORKDIR /opt/app
+COPY --from=builder /opt/app/target/simplecode-0.0.1-SNAPSHOT.jar application.jar
+RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
+
+FROM eclipse-temurin:21-jre
+WORKDIR /opt/app
+COPY --from=extractor /opt/app/extracted/dependencies/ ./
+COPY --from=extractor /opt/app/extracted/spring-boot-loader/ ./
+COPY --from=extractor /opt/app/extracted/snapshot-dependencies/ ./
+COPY --from=extractor /opt/app/extracted/application/ ./
+ENTRYPOINT ["java", "-jar", "application.jar"]
