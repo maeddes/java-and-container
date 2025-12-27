@@ -10,7 +10,7 @@ echo "Docker Image Tests - Started at $TIMESTAMP" > "$LOG_FILE"
 echo "----------------------------------------" >> "$LOG_FILE"
 
 # Get all Docker images (excluding intermediary images)
-images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -v "<none>")
+images=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep java-image | grep -v "<none>")
 
 # Check if any images exist
 if [ -z "$images" ]; then

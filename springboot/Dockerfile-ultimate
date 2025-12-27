@@ -22,19 +22,20 @@ RUN jlink \
 FROM eclipse-temurin:21-jre AS extractor
 WORKDIR /opt/app
 COPY --from=builder /opt/app/target/simplecode-0.0.1-SNAPSHOT.jar application.jar
-RUN java -Djarmode=layertools -jar application.jar extract
+RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 FROM ubuntu:jammy
 ENV JAVA_HOME=/opt/java/jdk21
 ENV PATH=$JAVA_HOME/bin:$PATH
 COPY --from=builder /customjre $JAVA_HOME
 WORKDIR /opt/app
-COPY --from=extractor /opt/app/dependencies/ ./
-COPY --from=extractor /opt/app/spring-boot-loader/ ./
-COPY --from=extractor /opt/app/snapshot-dependencies/ ./
-COPY --from=extractor /opt/app/application/ ./
+COPY --from=extractor /opt/app/extracted/dependencies/ ./
+COPY --from=extractor /opt/app/extracted/spring-boot-loader/ ./
+COPY --from=extractor /opt/app/extracted/snapshot-dependencies/ ./
+COPY --from=extractor /opt/app/extracted/application/ ./
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 RUN chown -R appuser:appuser /opt/app
 USER appuser
 
 ENTRYPOINT ["java","-XX:+UseParallelGC","-XX:MaxRAMPercentage=75", "-jar", "application.jar"]
+
