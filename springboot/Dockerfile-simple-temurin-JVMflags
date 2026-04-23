@@ -1,3 +1,3 @@
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 COPY target/simplecode-0.0.1-SNAPSHOT.jar /opt/app.jar
 ENTRYPOINT ["java","-XX:+UseParallelGC","-XX:MaxRAMPercentage=75","-jar", "/opt/app.jar"]

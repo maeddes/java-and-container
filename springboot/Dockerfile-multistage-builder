@@ -1,10 +1,10 @@
-FROM maven:3-eclipse-temurin-21 AS build
+FROM maven:3-eclipse-temurin-25 AS build
 WORKDIR /opt/app
 COPY src ./src
 COPY pom.xml .
 RUN mvn -f /opt/app/pom.xml package -DskipTests
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 COPY --from=build /opt/app/target/simplecode-0.0.1-SNAPSHOT.jar /opt/app.jar
 ENTRYPOINT ["java","-jar","/opt/app.jar"]
 

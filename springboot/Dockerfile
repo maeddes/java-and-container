@@ -1,9 +1,9 @@
-FROM maven:3-eclipse-temurin-21 AS build
+FROM maven:3-eclipse-temurin-25 AS build
 RUN mkdir -p /opt/app/src
 COPY src /opt/app/src
 COPY pom.xml /opt/app
 RUN --mount=type=cache,target=/root/.m2 mvn -f /opt/app/pom.xml package
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 COPY --from=build /opt/app/target/simplecode-0.0.1-SNAPSHOT.jar /opt/app.jar
 ENTRYPOINT ["java","-jar","/opt/app.jar"]

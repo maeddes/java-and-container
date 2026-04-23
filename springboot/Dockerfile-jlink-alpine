@@ -1,18 +1,19 @@
 # Build the code in a maven-container
-FROM maven:3-eclipse-temurin-21 AS maven-build
+FROM maven:3-eclipse-temurin-25 AS maven-build
 WORKDIR /opt/app
 COPY src ./src
 COPY pom.xml ./
 RUN --mount=type=cache,target=/root/.m2 mvn package -DskipTests
 
+
 # Build the JRE directly in an Alpine container to avoid glibc/musl libc issues
-FROM eclipse-temurin:21-alpine AS jre-build
+FROM eclipse-temurin:25-alpine AS jre-build
 WORKDIR /opt/app
 COPY --from=maven-build /opt/app/target/simplecode-0.0.1-SNAPSHOT.jar ./
 RUN jar xf simplecode-0.0.1-SNAPSHOT.jar
 RUN jdeps --ignore-missing-deps -q  \
     --recursive  \
-    --multi-release 21  \
+    --multi-release 25  \
     --print-module-deps  \
     --class-path 'BOOT-INF/lib/*'  \
     simplecode-0.0.1-SNAPSHOT.jar > deps.info
